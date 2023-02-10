@@ -6,10 +6,12 @@ ARG DEBIAN="bookworm"
 FROM python:${PYTHON}-${DEBIAN} AS base
 
 # ARG LIBS="libjpeg libxslt"
-ARG LIBS=""
-RUN  apt-get update \
-  && apt-get install -y sudo git curl zsh $LIBS \
-  && rm -rf /var/lib/apt/lists/*
+ARG LIBS="libjpeg62 libopenjp2-7 libtiff5 libxslt1.1 poppler-utils wv"
+# ARG LIBS="libjpeg62-turbo libxslt1.1"
+RUN <<EOT
+  apt-get update
+  apt-get install -y sudo git curl zsh $LIBS
+EOT
 
 # install python stuff
 RUN pip install plonecli
