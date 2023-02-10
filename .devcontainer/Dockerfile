@@ -2,7 +2,10 @@
 ARG PYTHON="3.11"
 ARG DEBIAN="bookworm"
 
+# base system debian
 FROM python:${PYTHON}-${DEBIAN} AS base
+
+# add zsh
 
 RUN  apt-get update \
   && apt-get install -y sudo git curl wget zsh \
@@ -11,16 +14,16 @@ RUN  apt-get update \
 # install python stuff
 RUN pip install plonecli
 
-# adding plone user
-ARG USER_NAME="plone"
+# adding a dev user
+ARG USER_NAME="dev"
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 RUN <<EOT
-  groupadd --gid ${USER_GID} plone
+  groupadd --gid ${USER_GID} ${USER_NAME}
   useradd --uid ${USER_UID} --gid ${USER_GID} --shell /bin/zsh -m ${USER_NAME}
 EOT
 
-USER plone
+USER ${USER_NAME}
 WORKDIR /home/${USER_NAME}
 
 # install ohmyzsh with powerlevel10k
