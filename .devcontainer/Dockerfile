@@ -5,24 +5,26 @@ ARG DEBIAN="bookworm"
 # base system debian
 FROM python:${PYTHON}-${DEBIAN} AS base
 
-# add zsh
-
+# ARG LIBS="libjpeg libxslt"
+ARG LIBS=""
 RUN  apt-get update \
-  && apt-get install -y sudo git curl wget zsh \
+  && apt-get install -y sudo git curl zsh $LIBS \
   && rm -rf /var/lib/apt/lists/*
 
 # install python stuff
 RUN pip install plonecli
 
-# adding a dev user
+# add system user and add to sudoers
 ARG USER_NAME="dev"
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 RUN <<EOT
   groupadd --gid ${USER_GID} ${USER_NAME}
   useradd --uid ${USER_UID} --gid ${USER_GID} --shell /bin/zsh -m ${USER_NAME}
+  echo "${USER_NAME} ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
 EOT
 
+# change to user and its home directory
 USER ${USER_NAME}
 WORKDIR /home/${USER_NAME}
 
